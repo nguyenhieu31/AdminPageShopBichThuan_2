@@ -103,7 +103,7 @@ export default function OrderPage() {
 
         fetchOrders("order-today");
     }, []);
-
+    console.log(orderData);
     const handleStatusSelect = (prop) => {
         let check;
         switch (prop) {
@@ -213,6 +213,7 @@ export default function OrderPage() {
                                             price={row.priceUnit}
                                             quantity={row.quantity}
                                             status={row.status}
+                                            pNote={row.personNote}
                                             selected={selected.indexOf(row.fullName) !== -1}
                                             handleClick={(event) => handleClick(event, row.fullName)}
                                         />

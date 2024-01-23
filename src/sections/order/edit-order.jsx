@@ -42,6 +42,7 @@ export default function EditOrder() {
         size: queryParams.get('productSize'),
         color: queryParams.get('productColor'),
         phone: queryParams.get('personPhone'),
+        pNote: queryParams.get('personNote'),
     });
 
 
@@ -133,6 +134,16 @@ export default function EditOrder() {
                             Thành tiền =  {order.price} x {order.quantity} = {order.price * order.quantity}
                         </Typography>
                     </Stack>
+
+                    <Stack direction='column' spacing={2} marginBottom={3}>
+                        <Typography variant='h6'>
+                            Person Note:
+                        </Typography>
+                        <Typography variant='body1'>
+                            {order.pNote}
+                        </Typography>
+                    </Stack>
+
                 </Stack>
             </Paper>
             <InputLabel htmlFor="status">

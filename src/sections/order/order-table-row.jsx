@@ -33,6 +33,7 @@ export default function OrderTableRow({
     price,
     quantity,
     status,
+    pNote,
     handleClick,
 }) {
     const [open, setOpen] = useState(null);
@@ -64,7 +65,7 @@ export default function OrderTableRow({
         }
     };
 
-    const handleEditOrder = (orderId, personName, productImage, productName, productColor, productSize, personAddress, personPhone, productPrice, productQuantity, orderStatus) => {
+    const handleEditOrder = (orderId, personName, productImage, productName, productColor, productSize, personAddress, personPhone, productPrice, productQuantity, orderStatus, personNote) => {
         const queryParams = {
             orderId,
             personName,
@@ -76,7 +77,8 @@ export default function OrderTableRow({
             personPhone,
             productPrice,
             productQuantity,
-            orderStatus
+            orderStatus,
+            personNote
         }
 
         navigate({
@@ -171,7 +173,7 @@ export default function OrderTableRow({
                     sx: { width: 140 },
                 }}
             >
-                <MenuItem onClick={() => handleEditOrder(id, fullName, pImage, pName, color, size, address, phone, price, quantity, status)}>
+                <MenuItem onClick={() => handleEditOrder(id, fullName, pImage, pName, color, size, address, phone, price, quantity, status, pNote)}>
                     <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
                     Edit
                 </MenuItem>
@@ -199,4 +201,5 @@ OrderTableRow.propTypes = {
     price: PropTypes.any,
     quantity: PropTypes.any,
     status: PropTypes.number,
+    pNote: PropTypes.string,
 };
