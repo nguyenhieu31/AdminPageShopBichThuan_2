@@ -1,4 +1,7 @@
+/* eslint-disable import/no-extraneous-dependencies */
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useDispatch,useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -6,6 +9,8 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { useTheme } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
+
+import { useRouter } from 'src/routes/hooks';
 
 import { useResponsive } from 'src/hooks/use-responsive';
 
@@ -18,12 +23,36 @@ import { NAV, HEADER } from './config-layout';
 import AccountPopover from './common/account-popover';
 import LanguagePopover from './common/language-popover';
 import NotificationsPopover from './common/notifications-popover';
+import {checkStateLogin} from '../../redux/authentication/authentication';
 
 // ----------------------------------------------------------------------
 
 export default function Header({ onOpenNav }) {
   const theme = useTheme();
-
+  const dispatch= useDispatch();
+  const router = useRouter();
+  const {isLogined,isLoadingStateLogin}= useSelector((state)=>state.authentication);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!isLogined) {
+        try {
+          await dispatch(checkStateLogin());
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+    fetchData();
+  }, [dispatch, isLogined]);
+  
+  useEffect(()=>{
+    const res=setTimeout(()=>{
+      if (!isLogined && !isLoadingStateLogin) {
+        router.push('/login');
+      }
+    },2000);
+    return ()=>clearTimeout(res);
+  },[isLoadingStateLogin, isLogined, router])
   const lgUp = useResponsive('up', 'lg');
 
   const renderContent = (

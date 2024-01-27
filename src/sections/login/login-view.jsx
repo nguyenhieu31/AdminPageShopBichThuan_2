@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
+import { useState,useEffect } from 'react';
+import { useDispatch,useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -20,28 +23,56 @@ import { bgGradient } from 'src/theme/css';
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 
-// ----------------------------------------------------------------------
+import {login} from '../../redux/authentication/authentication';
+
+
 
 export default function LoginView() {
   const theme = useTheme();
-
+  const dispatch= useDispatch();
   const router = useRouter();
-
+  const {isLogined}= useSelector((state)=>state.authentication);
   const [showPassword, setShowPassword] = useState(false);
-
+  const [userName,setUserName]= useState('');
+  const [password,setPassword]= useState('');
+  useEffect(()=>{
+    const accessToken= Cookies.get('accessToken');
+    if(isLogined || accessToken!==undefined){
+      router.push('/');
+    }
+  },[isLogined, router])
   const handleClick = () => {
-    router.push('/dashboard');
+    const checkUserNameValid= /[!@#$%^&*()?":{}|<>]/.test(userName); 
+    const checkPasswordValid= /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password);
+    if(userName===''){
+      toast.error('Trường tên đăng nhập không được để trống!');
+      return;
+    }
+    if(password===''){
+      toast.error('Trường mật khẩu không được để trống!');
+      return;
+    }
+    if(!checkUserNameValid && !checkPasswordValid){
+      const data= {
+        userName,
+        password
+      }
+      dispatch(login(data));
+    }else{
+      toast.error("Vui lòng nhập tài khoản và mật khẩu hợp lệ!");
+    }
   };
 
   const renderForm = (
     <>
       <Stack spacing={3}>
-        <TextField name="email" label="Email address" />
+        <TextField name="email" label="Tên Đăng Nhập" onChange={(e)=>{setUserName(e.target.value)}} />
 
         <TextField
           name="password"
-          label="Password"
+          label="Mật Khẩu"
           type={showPassword ? 'text' : 'password'}
+          onChange={(e)=>{setPassword(e.target.value)}}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -56,7 +87,7 @@ export default function LoginView() {
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
         <Link variant="subtitle2" underline="hover">
-          Forgot password?
+          Quên mật khẩu?
         </Link>
       </Stack>
 
@@ -66,9 +97,9 @@ export default function LoginView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={handleClick}
+        onClick={ handleClick}
       >
-        Login
+        Đăng nhập
       </LoadingButton>
     </>
   );
@@ -99,12 +130,12 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Sign in to Minimal</Typography>
+          <Typography variant="h4">Đăng nhập </Typography>
 
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            Don’t have an account?
+            Chưa có tài khoản?
             <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-              Get started
+              Bắt đầu
             </Link>
           </Typography>
 
@@ -142,7 +173,7 @@ export default function LoginView() {
 
           <Divider sx={{ my: 3 }}>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              OR
+              Hoặc
             </Typography>
           </Divider>
 

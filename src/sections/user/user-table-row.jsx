@@ -14,8 +14,6 @@ import IconButton from '@mui/material/IconButton';
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 
-// ----------------------------------------------------------------------
-
 export default function UserTableRow({
   selected,
   name,
@@ -24,6 +22,8 @@ export default function UserTableRow({
   role,
   isVerified,
   status,
+  created,
+  updated,
   handleClick,
 }) {
   const [open, setOpen] = useState(null);
@@ -61,7 +61,9 @@ export default function UserTableRow({
         <TableCell>
           <Label color={(status === 'banned' && 'error') || 'success'}>{status}</Label>
         </TableCell>
+        <TableCell>{created}</TableCell>
 
+<TableCell>{updated}</TableCell>
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
@@ -101,5 +103,7 @@ UserTableRow.propTypes = {
   name: PropTypes.any,
   role: PropTypes.any,
   selected: PropTypes.any,
+  created: PropTypes.any,
+  updated: PropTypes.any,
   status: PropTypes.string,
 };

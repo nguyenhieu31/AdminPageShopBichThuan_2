@@ -10,6 +10,8 @@ export const users = [...Array(24)].map((_, index) => ({
   company: faker.company.name(),
   isVerified: faker.datatype.boolean(),
   status: sample(['active', 'banned']),
+  created: 'Leader',
+  updated: 'Leader',
   role: sample([
     'Leader',
     'Hr Manager',

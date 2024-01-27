@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { useState,useEffect } from 'react';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -9,6 +10,8 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+
+import { axiosInstance } from 'src/utils/axios-util';
 
 import { users } from 'src/_mock/user';
 
@@ -36,7 +39,13 @@ export default function UserPage() {
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
+  useEffect(()=>{
+    const fetchData= async ()=>{
+      const res= await axiosInstance.get("/web/home");
+      console.log(res);
+    }
+    fetchData();
+  },[]);
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
     if (id !== '') {
@@ -53,7 +62,6 @@ export default function UserPage() {
     }
     setSelected([]);
   };
-
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
@@ -123,10 +131,12 @@ export default function UserPage() {
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
-                  { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
-                  { id: 'status', label: 'Status' },
+                  { id: 'email', label: 'Email' },
+                  { id: 'userName', label: 'User Name' },
+                  { id: 'phoneNumber', label: 'Phone Number' },
+                  { id: 'Status', label: 'Status' },
+                  { id: 'createdAt', label: 'Created At'},
+                  { id: 'updatedAt', label: 'Updated At'},
                   { id: '' },
                 ]}
               />
@@ -142,6 +152,8 @@ export default function UserPage() {
                       company={row.company}
                       avatarUrl={row.avatarUrl}
                       isVerified={row.isVerified}
+                      created={row.created}
+                      updated={row.updated}
                       selected={selected.indexOf(row.name) !== -1}
                       handleClick={(event) => handleClick(event, row.name)}
                     />

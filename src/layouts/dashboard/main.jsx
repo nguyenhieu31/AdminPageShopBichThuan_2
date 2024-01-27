@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 
 import { useResponsive } from 'src/hooks/use-responsive';
 
+import Loader from './common/loader';
 import { NAV, HEADER } from './config-layout';
 
 // ----------------------------------------------------------------------
@@ -12,7 +14,7 @@ const SPACING = 8;
 
 export default function Main({ children, sx, ...other }) {
   const lgUp = useResponsive('up', 'lg');
-
+  const {isLoadingStateLogin}=useSelector(state=>state.authentication);
   return (
     <Box
       component="main"
@@ -31,7 +33,13 @@ export default function Main({ children, sx, ...other }) {
       }}
       {...other}
     >
-      {children}
+      <>
+        {isLoadingStateLogin?(
+          <div style={{display:'flex',justifyContent:'center'}}>
+          <Loader/>
+      </div>
+        ):children}
+      </>
     </Box>
   );
 }

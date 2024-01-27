@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSelector,useDispatch } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -9,21 +10,24 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
+// import { useRouter } from 'src/routes/hooks';
+
 import { account } from 'src/_mock/account';
+import { logout } from 'src/redux/authentication/authentication';
 
 // ----------------------------------------------------------------------
 
 const MENU_OPTIONS = [
   {
-    label: 'Home',
+    label: 'Trang chủ',
     icon: 'eva:home-fill',
   },
   {
-    label: 'Profile',
+    label: 'Thông tin',
     icon: 'eva:person-fill',
   },
   {
-    label: 'Settings',
+    label: 'Cài đặt',
     icon: 'eva:settings-2-fill',
   },
 ];
@@ -32,15 +36,18 @@ const MENU_OPTIONS = [
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
-
+  const dispatch=useDispatch();
+  const {userName,isLogined}= useSelector(state=>state.authentication);
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
   };
-
   const handleClose = () => {
     setOpen(null);
   };
-
+  const handleLogout= async ()=>{
+    dispatch(logout());
+    setOpen(null);
+  }
   return (
     <>
       <IconButton
@@ -64,7 +71,7 @@ export default function AccountPopover() {
             border: (theme) => `solid 2px ${theme.palette.background.default}`,
           }}
         >
-          {account.displayName.charAt(0).toUpperCase()}
+          {userName!==''&&userName.charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
@@ -85,31 +92,41 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+          {userName!==''&& `Xin chào, ${userName}`}
           </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {MENU_OPTIONS.map((option) => (
+        {isLogined && MENU_OPTIONS.map((option) => (
           <MenuItem key={option.label} onClick={handleClose}>
             {option.label}
           </MenuItem>
         ))}
 
         <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
-
-        <MenuItem
-          disableRipple
-          disableTouchRipple
-          onClick={handleClose}
-          sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
-        >
-          Logout
-        </MenuItem>
+          {
+            isLogined?(
+              <MenuItem
+                disableRipple
+                disableTouchRipple
+                onClick={handleLogout}
+                sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
+              >
+                Đăng xuất
+              </MenuItem>
+            ):(
+              <MenuItem
+                disableRipple
+                disableTouchRipple
+                // onClick={handleClose}
+                sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
+              >
+                Đăng Nhập
+              </MenuItem>
+            )
+          }
+        
       </Popover>
     </>
   );
