@@ -15,7 +15,6 @@ import Iconify from 'src/components/iconify';
 
 export default function OrderTableToolbar({ numSelected, filterName, onFilterName, onStatusSelect }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
-    // const [selectedStatus, setSelectedStatus] = React.useState(null);
     const open = Boolean(anchorEl);
 
     const handleClick = (event) => {
