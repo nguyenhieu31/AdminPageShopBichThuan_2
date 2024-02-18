@@ -1,4 +1,7 @@
+import { toast } from 'react-toastify';
+import ReactLoading from 'react-loading';
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -11,14 +14,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
 import { users } from 'src/_mock/user';
-import fetchDataOrders from 'src/axios/fetchDataOrders';
 
-// import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
 import OrderTableRow from '../order-table-row';
 import OrderTableHead from '../order-table-head';
 import TableNoData from '../../user/table-no-data';
+import { fetchDataOrders } from '../redux/orderSlice';
 import OrderTableToolbar from '../order-table-toolbar';
 import TableEmptyRows from '../../user/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from '../../user/utils';
@@ -38,9 +40,9 @@ export default function OrderPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const [orderData, setOrderData] = useState([]);
-
   const [selectStatus, setSelectStatus] = useState(null);
+
+  const dispatch = useDispatch();
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -95,18 +97,14 @@ export default function OrderPage() {
     setFilterName(event.target.value);
   };
 
-  useEffect(() => {
-    const fetchOrders = async (path) => {
-      try {
-        const data = await fetchDataOrders(path);
-        setOrderData(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const isLoading = useSelector((state) => state.orders.isLoading);
+  const isError = useSelector((state) => state.orders.isError);
+  const orderData = useSelector((state) => state.orders.listOrders);
 
-    fetchOrders('order-today');
-  }, []);
+  useEffect(() => {
+    dispatch(fetchDataOrders('order-today'));
+  }, [dispatch]);
+
   const handleStatusSelect = (prop) => {
     let check;
     switch (prop) {
@@ -129,14 +127,7 @@ export default function OrderPage() {
   };
 
   const handleOrder = async (path) => {
-    setOrderData([]);
-    setSelectStatus(null);
-    try {
-      const data = await fetchDataOrders(path);
-      setOrderData(data);
-    } catch (error) {
-      console.error(error);
-    }
+    dispatch(fetchDataOrders(path));
   };
 
   const filteredOrders = orderData.filter(
@@ -180,12 +171,11 @@ export default function OrderPage() {
               <OrderTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={dataFiltered.length}
+                rowCount={users.length}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  // { id: 'orderid', label: 'Order Id' },
                   { id: 'fullnameAndproduct', label: 'Full Name / Product' },
                   { id: 'code', label: 'Code' },
                   { id: 'color', label: 'Color' },
@@ -199,25 +189,17 @@ export default function OrderPage() {
                   { id: '' },
                 ]}
               />
+              {isError && toast.error('Không thể tải được sản phẩm!!!')}
+
+              {isLoading && <ReactLoading type="spokes" color="#ff0000" height={50} width={50} />}
+
               <TableBody>
                 {dataFiltered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <OrderTableRow
                       key={row.orderId}
-                      id={row.orderId}
-                      code={row.orderCode}
-                      fullName={row.fullName}
-                      pImage={row.productImage}
-                      pName={row.productName}
-                      color={row.color}
-                      size={row.size}
-                      address={row.address}
-                      price={row.priceUnit}
-                      quantity={row.quantity}
-                      status={row.status}
-                      pNote={row.personNote}
-                      createdAt={row.createdAt}
+                      order={row}
                       selected={selected.indexOf(row.fullName) !== -1}
                       handleClick={(event) => handleClick(event, row.fullName)}
                     />
@@ -225,7 +207,7 @@ export default function OrderPage() {
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, dataFiltered.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}

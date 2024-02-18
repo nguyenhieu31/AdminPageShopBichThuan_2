@@ -20,7 +20,6 @@ export default function OrderTableToolbar({
   onStatusSelect,
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  // const [selectedStatus, setSelectedStatus] = React.useState(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
