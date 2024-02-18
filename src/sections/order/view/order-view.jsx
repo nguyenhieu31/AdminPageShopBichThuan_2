@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify';
-import ReactLoading from 'react-loading';
+// import ReactLoading from 'react-loading';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -20,9 +20,9 @@ import Scrollbar from 'src/components/scrollbar';
 import OrderTableRow from '../order-table-row';
 import OrderTableHead from '../order-table-head';
 import TableNoData from '../../user/table-no-data';
-import { fetchDataOrders } from '../redux/orderSlice';
 import OrderTableToolbar from '../order-table-toolbar';
 import TableEmptyRows from '../../user/table-empty-rows';
+import { fetchDataOrders } from '../../../redux/order/orderSlice';
 import { emptyRows, applyFilter, getComparator } from '../../user/utils';
 
 // ----------------------------------------------------------------------
@@ -97,7 +97,7 @@ export default function OrderPage() {
     setFilterName(event.target.value);
   };
 
-  const isLoading = useSelector((state) => state.orders.isLoading);
+  // const isLoading = useSelector((state) => state.orders.isLoading);
   const isError = useSelector((state) => state.orders.isError);
   const orderData = useSelector((state) => state.orders.listOrders);
 
@@ -191,7 +191,7 @@ export default function OrderPage() {
               />
               {isError && toast.error('Không thể tải được sản phẩm!!!')}
 
-              {isLoading && <ReactLoading type="spokes" color="#ff0000" height={50} width={50} />}
+              {/* {isLoading && <ReactLoading type="spokes" color="#ff0000" height={50} width={50} />} */}
 
               <TableBody>
                 {dataFiltered

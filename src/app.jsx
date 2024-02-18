@@ -1,10 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable perfectionist/sort-imports */
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
 import 'src/global.css';
-
-
 
 import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
 
@@ -19,7 +15,6 @@ export default function App() {
   return (
     <ThemeProvider>
       <Router />
-      <ToastContainer/>
     </ThemeProvider>
   );
 }
