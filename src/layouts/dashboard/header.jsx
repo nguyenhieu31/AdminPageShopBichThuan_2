@@ -23,7 +23,7 @@ import { NAV, HEADER } from './config-layout';
 import AccountPopover from './common/account-popover';
 import LanguagePopover from './common/language-popover';
 import NotificationsPopover from './common/notifications-popover';
-import {checkStateLogin} from '../../redux/authentication/authentication';
+import {checkStateLogin,checkPermissionAccessPage} from '../../redux/authentication/authentication';
 
 // ----------------------------------------------------------------------
 
@@ -36,7 +36,7 @@ export default function Header({ onOpenNav }) {
     const fetchData = async () => {
       if (!isLogined) {
         try {
-          await dispatch(checkStateLogin());
+          Promise.all([dispatch(checkPermissionAccessPage()),dispatch(checkStateLogin())]);
         } catch (error) {
           console.error(error);
         }

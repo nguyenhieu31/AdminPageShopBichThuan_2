@@ -26,11 +26,20 @@ export const login=createAsyncThunk(
      async (data)=>{
           try{
                const res= await axiosInstance.post("/auth/login", data);
-               if(res){
+               const checkPermissionAccount= await axiosInstance.get('/system/permission-page');
+               if(res && checkPermissionAccount){
                     toast.success("Đăng nhập thành công");
+                    return data.userName;
                }
-               return data.userName;
+               throw new Error("error when logined");
+               
           }catch(err){
+               if(err.status===401){
+                    toast.error('Tài khoản của bạn không  có quyền truy cập vào trang web này, vui lòng liên hệ với admin để có thể giải quyết!')
+               }
+               if(err.status===400){
+                    toast.error("Tài khoản hoặc mật khẩu không chính xác!");
+               }
                throw new Error(err);
           }
      }
@@ -49,11 +58,26 @@ export const logout= createAsyncThunk(
           }
      }
 )
+export const checkPermissionAccessPage= createAsyncThunk(
+     'checkPermissionAccessPage',
+     async ()=>{
+          try{
+               const res= await axiosInstance.get('/system/permission-page');
+               if(res.data){
+                    return res.data;
+               }
+               return res;
+          }catch(err){
+               throw new Error(err.message);
+          }
+     }
+)
 const initialState={
      isLogined: false,
      isLoading: false,
      isLoadingStateLogin: false,
      userName: '',
+     messagePermission: '',
      errorMessage: ''
 }
 const AuthenticationSlice= createSlice({
@@ -75,6 +99,9 @@ const AuthenticationSlice= createSlice({
                .addCase(logout.pending,(state)=>{
                     state.isLoading=true;
                })
+               .addCase(checkPermissionAccessPage.pending,(state)=>{
+                    state.isLoading=true;
+               })
                .addCase(checkStateLogin.fulfilled,(state,action)=>{
                     state.isLoadingStateLogin=false;
                     state.isLogined=true;
@@ -89,6 +116,10 @@ const AuthenticationSlice= createSlice({
                     state.isLoading=false;
                     state.isLogined=false;
                     state.userName='';
+               })
+               .addCase(checkPermissionAccessPage.fulfilled,(state,action)=>{
+                    state.isLoading=false;
+                    state.messagePermission=action.payload;
                })
                .addCase(checkStateLogin.rejected,(state,action)=>{
                     state.isLoadingStateLogin=false;
@@ -107,6 +138,12 @@ const AuthenticationSlice= createSlice({
                     state.isLogined=false;
                     state.userName='';
                     state.errorMessage=action.error.message;
+               })
+               .addCase(checkPermissionAccessPage.rejected,(state,action)=>{
+                    state.isLoading=false;
+                    state.isLogined=false;
+                    state.userName='';
+                    state.error= action.error.message;
                });
      }
 });

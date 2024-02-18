@@ -1,5 +1,7 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Stack from '@mui/material/Stack';
 import Avatar from '@mui/material/Avatar';
@@ -10,24 +12,33 @@ import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+// import NotInterestedIcon from '@mui/icons-material/NotInterested';
+
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+
+import { updateStatusOfUser, updateStateStatusOfUser } from 'src/redux/user/user';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 
 export default function UserTableRow({
+  userId,
   selected,
-  name,
-  avatarUrl,
-  company,
+  fullName,
   role,
-  isVerified,
   status,
-  created,
-  updated,
+  createdAt,
+  updatedAt,
   handleClick,
+  userName: PropUserName,
+  email,
+  phoneNumber,
+  updatedBy,
 }) {
   const [open, setOpen] = useState(null);
-
+  const dispatch = useDispatch();
+  const { userName } = useSelector((state) => state.authentication);
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -35,7 +46,33 @@ export default function UserTableRow({
   const handleCloseMenu = () => {
     setOpen(null);
   };
-
+  const handleUpdateStatusOfUser = () => {
+    const data = {
+      id: userId,
+      status: !status,
+      userName,
+    };
+    dispatch(updateStateStatusOfUser(data));
+    dispatch(updateStatusOfUser(data));
+    setOpen(null);
+  };
+  const handleOpenAlert = () => {
+    setOpen(null);
+    confirmAlert({
+      title: 'Vui lòng xác nhận!',
+      message: `Bạn muốn thay đổi trạng thái của người dùng ${fullName}?`,
+      buttons: [
+        {
+          label: 'Xác nhận',
+          onClick: () => handleUpdateStatusOfUser(),
+        },
+        {
+          label: 'Hủy',
+          onClick: () => console.log('Hủy'),
+        },
+      ],
+    });
+  };
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
@@ -45,25 +82,30 @@ export default function UserTableRow({
 
         <TableCell component="th" scope="row" padding="none">
           <Stack direction="row" alignItems="center" spacing={2}>
-            <Avatar alt={name} src={avatarUrl} />
+            <Avatar
+              alt={fullName}
+              src="https://pluspng.com/img-png/png-user-icon-icons-logos-emojis-users-2400.png"
+            />
             <Typography variant="subtitle2" noWrap>
-              {name}
+              {fullName}
             </Typography>
           </Stack>
         </TableCell>
 
-        <TableCell>{company}</TableCell>
+        <TableCell>{PropUserName}</TableCell>
 
         <TableCell>{role}</TableCell>
-
-        <TableCell align="center">{isVerified ? 'Yes' : 'No'}</TableCell>
+        <TableCell>{email}</TableCell>
+        <TableCell>{phoneNumber}</TableCell>
+        {/* <TableCell align="center">{status ? 'Yes' : 'No'}</TableCell> */}
 
         <TableCell>
-          <Label color={(status === 'banned' && 'error') || 'success'}>{status}</Label>
+          <Label color={status ? 'success' : 'error'}>{status ? 'Đang hoạt động' : 'Bị cấm'}</Label>
         </TableCell>
-        <TableCell>{created}</TableCell>
+        <TableCell>{createdAt}</TableCell>
 
-<TableCell>{updated}</TableCell>
+        <TableCell>{updatedAt}</TableCell>
+        <TableCell>{updatedBy}</TableCell>
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
@@ -85,10 +127,15 @@ export default function UserTableRow({
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
           Edit
         </MenuItem>
-
-        <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-          Delete
+        <MenuItem
+          onClick={handleOpenAlert}
+          sx={{ color: `${status ? 'error.main' : 'success.main'}` }}
+        >
+          <Iconify
+            icon={`${status ? 'eva:minus-circle-outline' : 'eva:checkmark-circle-2-outline'}`}
+            sx={{ mr: 2 }}
+          />
+          {status ? 'banned' : 'active'}
         </MenuItem>
       </Popover>
     </>
@@ -96,14 +143,16 @@ export default function UserTableRow({
 }
 
 UserTableRow.propTypes = {
-  avatarUrl: PropTypes.any,
-  company: PropTypes.any,
   handleClick: PropTypes.func,
-  isVerified: PropTypes.any,
-  name: PropTypes.any,
+  userId: PropTypes.number,
+  userName: PropTypes.string,
+  fullName: PropTypes.any,
+  email: PropTypes.string,
   role: PropTypes.any,
+  phoneNumber: PropTypes.string,
   selected: PropTypes.any,
-  created: PropTypes.any,
-  updated: PropTypes.any,
-  status: PropTypes.string,
+  createdAt: PropTypes.any,
+  updatedAt: PropTypes.any,
+  updatedBy: PropTypes.string,
+  status: PropTypes.bool,
 };

@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -11,9 +12,7 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import { axiosInstance } from 'src/utils/axios-util';
-
-import { users } from 'src/_mock/user';
+// import Loader from 'src/layouts/dashboard/common/loader';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -23,11 +22,14 @@ import UserTableRow from '../user-table-row';
 import UserTableHead from '../user-table-head';
 import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
+import { findAllUser } from '../../../redux/user/user';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
 // ----------------------------------------------------------------------
 
 export default function UserPage() {
+  const dispatch = useDispatch();
+  const { users } = useSelector((state) => state.user);
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -39,13 +41,11 @@ export default function UserPage() {
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  useEffect(()=>{
-    const fetchData= async ()=>{
-      const res= await axiosInstance.get("/web/home");
-      console.log(res);
+  useEffect(() => {
+    if (users && users.length === 0) {
+      dispatch(findAllUser());
     }
-    fetchData();
-  },[]);
+  }, [dispatch, users]);
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
     if (id !== '') {
@@ -130,13 +130,15 @@ export default function UserPage() {
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'name', label: 'Name' },
+                  { id: 'fullName', label: 'Họ và tên' },
+                  { id: 'userName', label: 'Tên đăng nhập' },
+                  { id: 'role', label: 'Vai trò' },
                   { id: 'email', label: 'Email' },
-                  { id: 'userName', label: 'User Name' },
-                  { id: 'phoneNumber', label: 'Phone Number' },
-                  { id: 'Status', label: 'Status' },
-                  { id: 'createdAt', label: 'Created At'},
-                  { id: 'updatedAt', label: 'Updated At'},
+                  { id: 'phoneNumber', label: 'Số điện thoại' },
+                  { id: 'Status', label: 'Trạng thái' },
+                  { id: 'createdAt', label: 'Ngày tạo' },
+                  { id: 'updatedAt', label: 'Ngày cập nhật' },
+                  { id: 'updatedBy', label: 'Nguời chỉnh sửa' },
                   { id: '' },
                 ]}
               />
@@ -145,15 +147,17 @@ export default function UserPage() {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <UserTableRow
-                      key={row.id}
-                      name={row.name}
+                      key={row.userId}
+                      userId={row.userId}
+                      fullName={row.fullName}
+                      phoneNumber={row.phoneNumber}
+                      email={row.email}
+                      userName={row.userName}
                       role={row.role}
                       status={row.status}
-                      company={row.company}
-                      avatarUrl={row.avatarUrl}
-                      isVerified={row.isVerified}
-                      created={row.created}
-                      updated={row.updated}
+                      createdAt={row.createdAt}
+                      updatedAt={row.updatedAt}
+                      updatedBy={row.updatedBy}
                       selected={selected.indexOf(row.name) !== -1}
                       handleClick={(event) => handleClick(event, row.name)}
                     />

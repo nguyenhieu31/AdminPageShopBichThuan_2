@@ -7,8 +7,8 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
+// import Button from '@mui/material/Button';
+// import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -20,7 +20,7 @@ import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
 
-import Logo from 'src/components/logo';
+import Logo from 'src/components/logo'; 
 import Iconify from 'src/components/iconify';
 
 import {login} from '../../redux/authentication/authentication';
@@ -41,9 +41,9 @@ export default function LoginView() {
       router.push('/');
     }
   },[isLogined, router])
-  const handleClick = () => {
-    const checkUserNameValid= /[!@#$%^&*()?":{}|<>]/.test(userName); 
-    const checkPasswordValid= /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password);
+  const handleLogin = () => {
+    const checkUserNameValid= /[ !@#$%^&*()?":{}|<>]/.test(userName);
+    const checkPasswordValid= /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()?":{}|<>])(?!.*\s).{8,}$/.test(password);
     if(userName===''){
       toast.error('Trường tên đăng nhập không được để trống!');
       return;
@@ -52,21 +52,26 @@ export default function LoginView() {
       toast.error('Trường mật khẩu không được để trống!');
       return;
     }
-    if(!checkUserNameValid && !checkPasswordValid){
+    if(!checkUserNameValid && checkPasswordValid){
       const data= {
         userName,
         password
       }
       dispatch(login(data));
+    }else if(checkUserNameValid){
+      toast.error("Vui lòng nhập tên đăng nhập không dấu cách hoặc không chứa kí tự đặc biệt!");
     }else{
-      toast.error("Vui lòng nhập tài khoản và mật khẩu hợp lệ!");
+      toast.error("Vui lòng nhập mật khẩu hợp lệ, độ dài tối thiểu 8 kí tự, có chứa chữ thường, chữ hoa, số và kí tự đặc biệt!");
     }
   };
-
+  const handleToastify=()=>{
+    toast.info("Vui lòng liên hệ với admin để giải quyết!!!");
+  }
   const renderForm = (
     <>
       <Stack spacing={3}>
-        <TextField name="email" label="Tên Đăng Nhập" onChange={(e)=>{setUserName(e.target.value)}} />
+        <TextField id='email' name="email" label="Tên Đăng Nhập" onChange={(e)=>{setUserName(e.target.value)}} />
+        
 
         <TextField
           name="password"
@@ -86,7 +91,7 @@ export default function LoginView() {
       </Stack>
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
-        <Link variant="subtitle2" underline="hover">
+        <Link variant="subtitle2" underline="hover" onClick={handleToastify}>
           Quên mật khẩu?
         </Link>
       </Stack>
@@ -97,7 +102,7 @@ export default function LoginView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={ handleClick}
+        onClick={ handleLogin}
       >
         Đăng nhập
       </LoadingButton>
@@ -134,11 +139,11 @@ export default function LoginView() {
 
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
             Chưa có tài khoản?
-            <Link variant="subtitle2" sx={{ ml: 0.5 }}>
+            <Link variant="subtitle2" sx={{ ml: 0.5 }} onClick={handleToastify}>
               Bắt đầu
             </Link>
           </Typography>
-
+{/* 
           <Stack direction="row" spacing={2}>
             <Button
               fullWidth
@@ -175,7 +180,7 @@ export default function LoginView() {
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Hoặc
             </Typography>
-          </Divider>
+          </Divider> */}
 
           {renderForm}
         </Card>

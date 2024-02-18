@@ -36,8 +36,8 @@ export default function Main({ children, sx, ...other }) {
       <>
         {isLoadingStateLogin?(
           <div style={{display:'flex',justifyContent:'center'}}>
-          <Loader/>
-      </div>
+            <Loader/>
+          </div>
         ):children}
       </>
     </Box>

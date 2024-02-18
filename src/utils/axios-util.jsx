@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable import/no-extraneous-dependencies */
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -20,6 +21,9 @@ const callRefreshToken = async ()=> {
         isRefreshing = false;
     }
 };
+const callLogout= async ()=>{
+    await axiosInstance.get('/auth/logout');
+}
 axiosInstance.interceptors.request.use(
     (config) => {
         const accessToken = Cookies.get('accessToken');
@@ -55,6 +59,7 @@ axiosInstance.interceptors.response.use(
         if (err.response.status === 401) {
             const accessToken = Cookies.get('accessToken');
             if (accessToken !== undefined) {
+                await callLogout();
                 err.response.message = 'phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại';
             }else{
                 err.response.message = 'vui lòng đăng nhập lại';
