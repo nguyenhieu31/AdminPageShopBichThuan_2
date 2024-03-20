@@ -6,14 +6,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-
-import { users } from 'src/_mock/user';
 
 import Scrollbar from 'src/components/scrollbar';
 
@@ -22,8 +20,8 @@ import OrderTableHead from '../order-table-head';
 import TableNoData from '../../user/table-no-data';
 import OrderTableToolbar from '../order-table-toolbar';
 import TableEmptyRows from '../../user/table-empty-rows';
-import { fetchDataOrders } from '../../../redux/order/orderSlice';
 import { emptyRows, applyFilter, getComparator } from '../../user/utils';
+import { fetchDataOrders,getDataByStatusOrder } from '../../../redux/order/orderSlice';
 
 // ----------------------------------------------------------------------
 
@@ -41,8 +39,20 @@ export default function OrderPage() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const [selectStatus, setSelectStatus] = useState(null);
+  const [loadStatus, setLoadStatus] = useState(null);
 
   const dispatch = useDispatch();
+  const {isError, listOrders} = useSelector((state) => state.orders);
+
+  useEffect(() => {
+    dispatch(fetchDataOrders('order/all'));
+  }, [dispatch]);
+
+  useEffect(()=>{
+    if(selectStatus || selectStatus===0){
+      dispatch(getDataByStatusOrder(selectStatus));
+    }
+  },[dispatch, selectStatus])
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -54,18 +64,14 @@ export default function OrderPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.name);
+      const newSelecteds = listOrders.map((orderItem) => orderItem.orderCode);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
-  // const handleClickItemOrder=(orderId)=>{
-  //     const findOrderById= orderData.find((orderItem)=>orderItem.id===orderId);
-
-  // }
-  const handleClick = (event, name) => {
+  const handleClick = (name,statusOrder) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected = [];
     if (selectedIndex === -1) {
@@ -80,6 +86,7 @@ export default function OrderPage() {
         selected.slice(selectedIndex + 1)
       );
     }
+    setLoadStatus(statusOrder)
     setSelected(newSelected);
   };
 
@@ -97,21 +104,17 @@ export default function OrderPage() {
     setFilterName(event.target.value);
   };
 
-  // const isLoading = useSelector((state) => state.orders.isLoading);
-  const isError = useSelector((state) => state.orders.isError);
-  const orderData = useSelector((state) => state.orders.listOrders);
-
-  useEffect(() => {
-    dispatch(fetchDataOrders('order-today'));
-  }, [dispatch]);
-
   const handleStatusSelect = (prop) => {
     let check;
+    console.log(prop);
     switch (prop) {
+      case 'Tất cả':
+        check = 6
+        break;
       case 'Chờ xác nhận':
         check = 0;
         break;
-      case 'Chờ vận chuyển':
+      case 'Chờ lấy hàng':
         check = 1;
         break;
       case 'Đang giao hàng':
@@ -120,41 +123,31 @@ export default function OrderPage() {
       case 'Đã giao hàng':
         check = 3;
         break;
+        case 'Đã Huỷ':
+          check = 4;
+          break;
+      case 'Trả hàng/hoàn hàng':
+        check = 5;
+        break;
       default:
         break;
     }
     setSelectStatus(check);
   };
-
-  const handleOrder = async (path) => {
-    dispatch(fetchDataOrders(path));
-  };
-
-  const filteredOrders = orderData.filter(
-    (o) => selectStatus === null || o.status === selectStatus
-  );
-
+  const handleTimeSelect = ()=>{
+    
+  }
   const dataFiltered = applyFilter({
-    inputData: filteredOrders,
+    inputData: listOrders,
     comparator: getComparator(order, orderBy),
     filterName,
   });
-
+  console.log(selected);
   const notFound = !dataFiltered.length && !!filterName;
-
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Orders</Typography>
-
-        <Stack direction="row" spacing={2}>
-          <Button variant="contained" color="primary" onClick={() => handleOrder('order-today')}>
-            Today
-          </Button>
-          <Button variant="contained" color="primary" onClick={() => handleOrder('order-7-days')}>
-            7 Days
-          </Button>
-        </Stack>
       </Stack>
 
       <Card>
@@ -163,6 +156,8 @@ export default function OrderPage() {
           filterName={filterName}
           onFilterName={handleFilterByName}
           onStatusSelect={handleStatusSelect}
+          selectStatus={selectStatus || loadStatus}
+          selected={selected}
         />
 
         <Scrollbar>
@@ -171,28 +166,25 @@ export default function OrderPage() {
               <OrderTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={users.length}
+                rowCount={listOrders&&listOrders.length}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'fullnameAndproduct', label: 'Full Name / Product' },
-                  { id: 'code', label: 'Code' },
-                  { id: 'color', label: 'Color' },
-                  { id: 'size', label: 'Size' },
-                  { id: 'address', label: 'Address' },
-                  { id: 'price', label: 'Price' },
-                  { id: 'quantity', label: 'Quantity' },
-                  { id: 'total', label: 'Total' },
-                  { id: 'status', label: 'Status' },
-                  { id: 'createdAt', label: 'CreatedAt' },
+                  { id: 'fullnameAndproduct', label: 'Tên Người đặt / sản phầm' },
+                  { id: 'code', label: 'Mã đơn hàng' },
+                  { id: 'color', label: 'Màu sắc' },
+                  { id: 'size', label: 'Kích cỡ' },
+                  { id: 'address', label: 'Địa chỉ' },
+                  { id: 'price', label: 'Giá sản phẩm' },
+                  { id: 'quantity', label: 'Số lượng' },
+                  { id: 'total', label: 'Tổng tiền' },
+                  { id: 'status', label: 'Trạng thái' },
+                  { id: 'createdAt', label: 'Ngày đặt' },
                   { id: '' },
                 ]}
               />
               {isError && toast.error('Không thể tải được sản phẩm!!!')}
-
-              {/* {isLoading && <ReactLoading type="spokes" color="#ff0000" height={50} width={50} />} */}
-
               <TableBody>
                 {dataFiltered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -200,8 +192,8 @@ export default function OrderPage() {
                     <OrderTableRow
                       key={row.orderId}
                       order={row}
-                      selected={selected.indexOf(row.fullName) !== -1}
-                      handleClick={(event) => handleClick(event, row.fullName)}
+                      selected={selected.indexOf(row.orderCode) !== -1}
+                      handleClick={() => handleClick(row.orderCode,row.status)}
                     />
                   ))}
 

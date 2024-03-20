@@ -12,9 +12,10 @@ import {
   MenuItem,
   InputLabel,
   Typography,
+  Box,
 } from '@mui/material';
 
-import { updatedOrderById } from './redux/orderSlice';
+import { updatedOrderById } from '../../redux/order/orderSlice';
 
 export default function EditOrder() {
   const { state } = useLocation();
@@ -74,67 +75,28 @@ export default function EditOrder() {
   };
 
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <Paper>
-        <Stack>
-          <Typography variant="h5" align="center" marginBottom={3}>
-            Edit Order For {order.fullName}
-          </Typography>
-
-          <Stack direction="row" alignItems="center" spacing={2} marginBottom={3}>
-            <Typography variant="h6">Product Image:</Typography>
-            <Avatar
-              alt="Product Image"
-              src={order.productImage}
-              sx={{ width: 150, height: 150 }}
-              variant="rounded"
-            />
-
-            <Typography variant="h6">Product Name: {order.productName}</Typography>
-
-            <Typography variant="h6">Color: {order.color}</Typography>
-
-            <Typography variant="h6">Size: {order.size}</Typography>
-          </Stack>
-
-          <Stack direction="row" alignItems="center" spacing={2} marginBottom={3}>
-            <Typography variant="h6">Address: {order.address}</Typography>
-
-            <Typography variant="h6">Phone number: {order.phone}</Typography>
-          </Stack>
-
-          <Stack direction="row" alignItems="center" spacing={2} marginBottom={3}>
-            <Typography variant="h6">
-              Thành tiền = {order.priceUnit} x {order.quantity} = {order.priceUnit * order.quantity}
-            </Typography>
-          </Stack>
-
-          <Stack direction="column" spacing={2} marginBottom={3}>
-            <Typography variant="h6">Person Note:</Typography>
-            <Typography variant="body1">{order.personNote}</Typography>
-          </Stack>
-        </Stack>
-      </Paper>
-      <InputLabel htmlFor="status">
-        <Stack direction="row" alignItems="center" spacing={2} marginBottom={3}>
-          <Typography variant="h6">Status:</Typography>
-          <Select name="status" id="status" onChange={handleChange} value={formik.values.status}>
-            <MenuItem value="Chờ xác nhận">Chờ xác nhận</MenuItem>
-            <MenuItem value="Chờ vận chuyển">Chờ vận chuyển</MenuItem>
-            <MenuItem value="Đang giao hàng">Đang giao hàng</MenuItem>
-            <MenuItem value="Đã giao hàng">Đã giao hàng</MenuItem>
-          </Select>
-        </Stack>
-      </InputLabel>
-
-      <Stack direction="row" alignItems="center" spacing={2} marginBottom={3}>
-        <Button style={{ backgroundColor: 'blue', color: 'white' }} type="submit">
-          Save
-        </Button>
-        <Button style={{ backgroundColor: 'red', color: 'white' }} onClick={hanldeCancel}>
-          Cancel
-        </Button>
-      </Stack>
-    </form>
+    <Box>
+      <header>
+        <h1>Thông tin chi tiết</h1>
+        <div className='info-customer'>
+          <Typography>Người đặt hàng: </Typography>
+          <Typography>Địa chỉ: </Typography>
+          <Typography>Số điện thoại: </Typography>
+          <Typography>Lời nhắn từ khách hàng: </Typography>
+        </div>
+      </header>
+      <div>
+        <h1>Sản Phẩm</h1>
+        <div className='info-product'>
+          <Typography>Tên sản phẩm: </Typography>
+          <Typography>Mã sản phẩm: </Typography>
+          <Typography>Màu sắc: </Typography>
+          <Typography>Kích c��: </Typography>
+          <Typography>Đơn giá: </Typography>
+          <Typography>Số lượng: </Typography>
+          <Typography>T��ng tiền: </Typography>
+        </div>
+      </div>
+    </Box>
   );
 }

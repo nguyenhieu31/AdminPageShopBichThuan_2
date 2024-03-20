@@ -20,23 +20,26 @@ export default function OrderTableRow({ selected, order, handleClick }) {
   const handleEditOrder = (orderId) => {
     navigate(`/edit-order/${orderId}`, { state: { order } });
   };
-
   const getStatusLabel = (check) => {
     switch (check) {
       case 0:
-        return 'Chờ xác nhận';
+        return 'Chờ xác nhận'
       case 1:
-        return 'Chờ vận chuyển';
+        return 'Chờ lấy hàng';
       case 2:
         return 'Đang giao hàng';
       case 3:
         return 'Đã giao hàng';
+      case 4:
+        return 'Đã huỷ';
+      case 5:
+        return 'Trả hàng/hoàn hàng';
       default:
         return 'Không xác định';
     }
   };
   return (
-    <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
+    <TableRow hover tabIndex={-1} role="checkbox" selected={selected} sx={{cursor: 'pointer'}}>
       <TableCell padding="checkbox">
         <Checkbox disableRipple checked={selected} onChange={handleClick} />
       </TableCell>
@@ -56,7 +59,7 @@ export default function OrderTableRow({ selected, order, handleClick }) {
       </TableCell>
       <TableCell>
         <Typography variant="body2" noWrap>
-          {order.code}
+          {order.orderCode}
         </Typography>
       </TableCell>
       <TableCell>
@@ -75,7 +78,7 @@ export default function OrderTableRow({ selected, order, handleClick }) {
 
       <TableCell>
         <Typography variant="body2" noWrap>
-          {order.priceUnit} VNĐ
+          {order.priceUnit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} VNĐ
         </Typography>
       </TableCell>
 
@@ -83,7 +86,7 @@ export default function OrderTableRow({ selected, order, handleClick }) {
 
       <TableCell>
         <Typography variant="body2" noWrap>
-          {order.priceUnit * order.quantity} VNĐ
+          {(order.priceUnit * order.quantity).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} VNĐ
         </Typography>
       </TableCell>
 
