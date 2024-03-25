@@ -1,3 +1,5 @@
+import { toast } from 'react-toastify';
+import ReactLoading from 'react-loading';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -7,17 +9,11 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import { Button, TablePagination } from '@mui/material';
 
-// import { products } from 'src/_mock/products';
-
-import { toast } from 'react-toastify';
-import ReactLoading from 'react-loading';
-
-// import { applyFilter } from 'src/sections/order/utils';
+import { fetchProducts } from 'src/redux/product/productSlice';
 
 import ProductCard from '../product-card';
 import ProductSort from '../product-sort';
 import ProductFilters from '../product-filters';
-import { fetchProducts } from '../redux/productSlice';
 
 // ----------------------------------------------------------------------
 

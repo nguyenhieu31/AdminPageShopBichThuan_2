@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
-import { useState,useEffect } from 'react';
-import { useDispatch,useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -20,130 +20,130 @@ import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
 
-import Logo from 'src/components/logo'; 
+import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 
-import {login} from '../../redux/authentication/authentication';
+import { login } from '../../redux/authentication/authentication';
 
 
 
 export default function LoginView() {
-  const theme = useTheme();
-  const dispatch= useDispatch();
-  const router = useRouter();
-  const {isLogined}= useSelector((state)=>state.authentication);
-  const [showPassword, setShowPassword] = useState(false);
-  const [userName,setUserName]= useState('');
-  const [password,setPassword]= useState('');
-  useEffect(()=>{
-    const accessToken= Cookies.get('accessToken');
-    if(isLogined || accessToken!==undefined){
-      router.push('/');
+    const theme = useTheme();
+    const dispatch = useDispatch();
+    const router = useRouter();
+    const { isLogined } = useSelector((state) => state.authentication);
+    const [showPassword, setShowPassword] = useState(false);
+    const [userName, setUserName] = useState('');
+    const [password, setPassword] = useState('');
+    useEffect(() => {
+        const accessToken = Cookies.get('accessToken');
+        if (isLogined || accessToken !== undefined) {
+            router.push('/');
+        }
+    }, [isLogined, router])
+    const handleLogin = () => {
+        const checkUserNameValid = /[ !@#$%^&*()?":{}|<>]/.test(userName);
+        const checkPasswordValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()?":{}|<>])(?!.*\s).{8,}$/.test(password);
+        if (userName === '') {
+            toast.error('Trường tên đăng nhập không được để trống!');
+            return;
+        }
+        if (password === '') {
+            toast.error('Trường mật khẩu không được để trống!');
+            return;
+        }
+        if (!checkUserNameValid && checkPasswordValid) {
+            const data = {
+                userName,
+                password
+            }
+            dispatch(login(data));
+        } else if (checkUserNameValid) {
+            toast.error("Vui lòng nhập tên đăng nhập không dấu cách hoặc không chứa kí tự đặc biệt!");
+        } else {
+            toast.error("Vui lòng nhập mật khẩu hợp lệ, độ dài tối thiểu 8 kí tự, có chứa chữ thường, chữ hoa, số và kí tự đặc biệt!");
+        }
+    };
+    const handleToastify = () => {
+        toast.info("Vui lòng liên hệ với admin để giải quyết!!!");
     }
-  },[isLogined, router])
-  const handleLogin = () => {
-    const checkUserNameValid= /[ !@#$%^&*()?":{}|<>]/.test(userName);
-    const checkPasswordValid= /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()?":{}|<>])(?!.*\s).{8,}$/.test(password);
-    if(userName===''){
-      toast.error('Trường tên đăng nhập không được để trống!');
-      return;
-    }
-    if(password===''){
-      toast.error('Trường mật khẩu không được để trống!');
-      return;
-    }
-    if(!checkUserNameValid && checkPasswordValid){
-      const data= {
-        userName,
-        password
-      }
-      dispatch(login(data));
-    }else if(checkUserNameValid){
-      toast.error("Vui lòng nhập tên đăng nhập không dấu cách hoặc không chứa kí tự đặc biệt!");
-    }else{
-      toast.error("Vui lòng nhập mật khẩu hợp lệ, độ dài tối thiểu 8 kí tự, có chứa chữ thường, chữ hoa, số và kí tự đặc biệt!");
-    }
-  };
-  const handleToastify=()=>{
-    toast.info("Vui lòng liên hệ với admin để giải quyết!!!");
-  }
-  const renderForm = (
-    <>
-      <Stack spacing={3}>
-        <TextField id='email' name="email" label="Tên Đăng Nhập" onChange={(e)=>{setUserName(e.target.value)}} />
-        
+    const renderForm = (
+        <>
+            <Stack spacing={3}>
+                <TextField id='email' name="email" label="Tên Đăng Nhập" onChange={(e) => { setUserName(e.target.value) }} />
 
-        <TextField
-          name="password"
-          label="Mật Khẩu"
-          type={showPassword ? 'text' : 'password'}
-          onChange={(e)=>{setPassword(e.target.value)}}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Stack>
 
-      <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
-        <Link variant="subtitle2" underline="hover" onClick={handleToastify}>
-          Quên mật khẩu?
-        </Link>
-      </Stack>
+                <TextField
+                    name="password"
+                    label="Mật Khẩu"
+                    type={showPassword ? 'text' : 'password'}
+                    onChange={(e) => { setPassword(e.target.value) }}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                    <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </Stack>
 
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="submit"
-        variant="contained"
-        color="inherit"
-        onClick={ handleLogin}
-      >
-        Đăng nhập
-      </LoadingButton>
-    </>
-  );
+            <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
+                <Link variant="subtitle2" underline="hover" onClick={handleToastify}>
+                    Quên mật khẩu?
+                </Link>
+            </Stack>
 
-  return (
-    <Box
-      sx={{
-        ...bgGradient({
-          color: alpha(theme.palette.background.default, 0.9),
-          imgUrl: '/assets/background/overlay_4.jpg',
-        }),
-        height: 1,
-      }}
-    >
-      <Logo
-        sx={{
-          position: 'fixed',
-          top: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 },
-        }}
-      />
+            <LoadingButton
+                fullWidth
+                size="large"
+                type="submit"
+                variant="contained"
+                color="inherit"
+                onClick={handleLogin}
+            >
+                Đăng nhập
+            </LoadingButton>
+        </>
+    );
 
-      <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
-        <Card
-          sx={{
-            p: 5,
-            width: 1,
-            maxWidth: 420,
-          }}
+    return (
+        <Box
+            sx={{
+                ...bgGradient({
+                    color: alpha(theme.palette.background.default, 0.9),
+                    imgUrl: '/assets/background/overlay_4.jpg',
+                }),
+                height: 1,
+            }}
         >
-          <Typography variant="h4">Đăng nhập </Typography>
+            <Logo
+                sx={{
+                    position: 'fixed',
+                    top: { xs: 16, md: 24 },
+                    left: { xs: 16, md: 24 },
+                }}
+            />
 
-          <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            Chưa có tài khoản?
-            <Link variant="subtitle2" sx={{ ml: 0.5 }} onClick={handleToastify}>
-              Bắt đầu
-            </Link>
-          </Typography>
-{/* 
+            <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
+                <Card
+                    sx={{
+                        p: 5,
+                        width: 1,
+                        maxWidth: 420,
+                    }}
+                >
+                    <Typography variant="h4">Đăng nhập </Typography>
+
+                    <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
+                        Chưa có tài khoản?
+                        <Link variant="subtitle2" sx={{ ml: 0.5 }} onClick={handleToastify}>
+                            Bắt đầu
+                        </Link>
+                    </Typography>
+                    {/* 
           <Stack direction="row" spacing={2}>
             <Button
               fullWidth
@@ -182,9 +182,9 @@ export default function LoginView() {
             </Typography>
           </Divider> */}
 
-          {renderForm}
-        </Card>
-      </Stack>
-    </Box>
-  );
+                    {renderForm}
+                </Card>
+            </Stack>
+        </Box>
+    );
 }
